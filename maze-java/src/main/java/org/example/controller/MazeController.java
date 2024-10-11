@@ -8,7 +8,7 @@ import javax.swing.*;
 public class MazeController {
     private MazeModel model;
     private MazeView view;
-
+/*
     public MazeController(MazeModel model, MazeView view) {
         this.model = model;
         this.view = view;
@@ -30,5 +30,7 @@ public class MazeController {
         // Atualiza a posição do jogador na view
         view.atualizarPosicaoJogador(model.getPlayerRow(), model.getPlayerCol());
     }
+
+ */
 }
 

@@ -9,38 +9,71 @@ public class MazeGenerator {
     private int cols;
     private int[][] maze;
     private boolean[][] visited;
+    private int entranceRow = 0;
+    private int entranceCol = 1;
+    private int exitRow;
+    private int exitCol;
 
     public MazeGenerator(int rows, int cols) {
         this.rows = rows;
         this.cols = cols;
         this.maze = new int[rows][cols];
         this.visited = new boolean[rows][cols];
+
+        // Definindo a saída
+        this.exitRow = rows - 1;
+        this.exitCol = cols - 2;
+
+        // Inicializando o labirinto com paredes (1)
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                maze[r][c] = 1; // Paredes
+            }
+        }
     }
 
-    public void generateMaze(int startRow, int startCol) {
-        visited[startRow][startCol] = true;
-        maze[startRow][startCol] = 0; // 0 represents path
+    public void generateMaze() {
+        maze[entranceRow][entranceCol] = 0;
+        visited[entranceRow][entranceCol] = true;
 
-        // Directions for moving up, down, left, right
-        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        // Gera o caminho aleatório até a saída
+        createPath(entranceRow, entranceCol);
+
+        // Certifica que a saída está marcada como caminho
+        maze[exitRow][exitCol] = 0;
+    }
+
+    private void createPath(int currentRow, int currentCol) {
+        if (currentRow == exitRow && currentCol == exitCol) {
+            return; // Se chegamos à saída, paramos a recursão
+        }
+
+        int[][] directions = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}}; // Up, Down, Left, Right
         Random random = new Random();
 
-        // Shuffle directions to create randomness
-        for (int i = 0; i < 4; i++) {
-            int randIndex = random.nextInt(4);
+        // Embaralha as direções
+        for (int i = 0; i < directions.length; i++) {
+            int randIndex = random.nextInt(directions.length);
             int[] temp = directions[i];
             directions[i] = directions[randIndex];
             directions[randIndex] = temp;
         }
 
         for (int[] direction : directions) {
-            int newRow = startRow + direction[0] * 2;
-            int newCol = startCol + direction[1] * 2;
+            int newRow = currentRow + direction[0];
+            int newCol = currentCol + direction[1];
 
+            // Verifica se a nova célula é válida
             if (isValid(newRow, newCol)) {
-                // Remove wall between current cell and new cell
-                maze[startRow + direction[0]][startCol + direction[1]] = 0;
-                generateMaze(newRow, newCol);
+                // Remove a parede entre a célula atual e a nova célula
+                maze[currentRow + direction[0] / 2][currentCol + direction[1] / 2] = 0;
+
+                // Marca a nova célula como visitada
+                maze[newRow][newCol] = 0;
+                visited[newRow][newCol] = true;
+
+                // Chama recursivamente para a nova célula
+                createPath(newRow, newCol);
             }
         }
     }
@@ -49,12 +82,6 @@ public class MazeGenerator {
         return row > 0 && row < rows && col > 0 && col < cols && !visited[row][col];
     }
 
-    public void setEntryAndExit() {
-        // Set entrance at (0, 1)
-        maze[0][1] = 0; // Entrance
-        // Set exit at (rows-1, cols-2)
-        maze[rows - 1][cols - 2] = 0; // Exit
-    }
 
     public void printMaze() {
         for (int[] row : maze) {

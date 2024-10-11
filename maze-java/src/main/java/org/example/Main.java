@@ -14,15 +14,11 @@ public class Main {
         int cols = 7; // Must be odd to create walls
 
         MazeGenerator mazeGenerator = new MazeGenerator(rows, cols);
-        mazeGenerator.generateMaze(1, 1); // Start from (1, 1)
-        mazeGenerator.setEntryAndExit(); // Set entrance and exit
+        mazeGenerator.generateMaze();
         mazeGenerator.printMaze(); // Optional: print the maze to console
-        mazeGenerator.saveMazeToCSV("maze.csv"); // Save to CSV
+        /// mazeGenerator.saveMazeToCSV("maze.csv"); // Save to CSV
         /// fim mazegenerator ///
 
 
-        MazeModel model = new MazeModel();
-        MazeView view = new MazeView(model.getLabirinto());
-        MazeController controller = new MazeController(model, view);
     }
 }

@@ -12,7 +12,7 @@ public class MazeModel {
     public MazeModel(String csvFilename) {
         this.maze = loadMaze(csvFilename);
     }
-
+/*
     public int[][] getLabirinto() {
         return labirinto;
     }
@@ -45,7 +45,7 @@ public class MazeModel {
             playerCol = novaColuna;
         }
     }
-
+*/
     public static ArrayList<ArrayList<Integer>> loadMaze(String csvFilename) {
         ArrayList<ArrayList<Integer>> maze = new ArrayList<>();
         File f = new File(csvFilename);
