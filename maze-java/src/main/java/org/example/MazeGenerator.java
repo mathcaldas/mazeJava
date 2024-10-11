@@ -5,104 +5,119 @@ import java.io.IOException;
 import java.util.Random;
 
 public class MazeGenerator {
-    private int rows;
-    private int cols;
+    private static final int WALL = 0;
+    private static final int PATH = 1;
+    private static final int ROWS = 10;
+    private static final int COLS = 10;
     private int[][] maze;
-    private boolean[][] visited;
-    private int entranceRow = 0;
-    private int entranceCol = 1;
-    private int exitRow;
-    private int exitCol;
+    private Random random = new Random();
+    private int borderPathCount = 0; // Contador de caminhos nas bordas
 
-    public MazeGenerator(int rows, int cols) {
-        this.rows = rows;
-        this.cols = cols;
-        this.maze = new int[rows][cols];
-        this.visited = new boolean[rows][cols];
+    public MazeGenerator() {
+        maze = new int[ROWS][COLS];
+        generateMaze();
+        limitBorderPaths(); // Corrige para garantir apenas 2 caminhos nas bordas
+        saveMazeToCSV("maze.csv");
+    }
 
-        // Definindo a saída
-        this.exitRow = rows - 1;
-        this.exitCol = cols - 2;
+    private void generateMaze() {
+        // Inicializa o labirinto com paredes
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                maze[i][j] = WALL;
+            }
+        }
+        maze[0][0] = PATH; // Entrada na posição [0,0]
+        borderPathCount++; // Conta a entrada como caminho de borda
+        carvePath(0, 0); // Inicia a escavação
+    }
 
-        // Inicializando o labirinto com paredes (1)
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                maze[r][c] = 1; // Paredes
+    private void carvePath(int x, int y) {
+        int[] dx = {0, 1, 0, -1}; // Movimentos possíveis: direita, baixo, esquerda, cima
+        int[] dy = {1, 0, -1, 0};
+
+        // Embaralha as direções para garantir aleatoriedade
+        for (int i = 0; i < dx.length; i++) {
+            int randIndex = random.nextInt(dx.length);
+            int temp = dx[i];
+            dx[i] = dx[randIndex];
+            dx[randIndex] = temp;
+
+            temp = dy[i];
+            dy[i] = dy[randIndex];
+            dy[randIndex] = temp;
+        }
+
+        // Tenta escavar em cada direção
+        for (int i = 0; i < 4; i++) {
+            int nx = x + dx[i] * 2;
+            int ny = y + dy[i] * 2;
+
+            // Verifica se a nova posição está dentro dos limites e se é uma parede
+            if (nx >= 0 && ny >= 0 && nx < ROWS && ny < COLS && maze[nx][ny] == WALL) {
+                maze[x + dx[i]][y + dy[i]] = PATH; // Cria o caminho
+                maze[nx][ny] = PATH; // Marca a nova célula como caminho
+                carvePath(nx, ny); // Recursivamente escava a próxima célula
             }
         }
     }
 
-    public void generateMaze() {
-        maze[entranceRow][entranceCol] = 0;
-        visited[entranceRow][entranceCol] = true;
+    // Garante que as bordas tenham apenas uma entrada e uma saída
+    private void limitBorderPaths() {
+        // Conta e coleta as posições dos caminhos nas bordas
+        int[][] borderPaths = new int[ROWS * 2 + COLS * 2][2];
+        int count = 0;
 
-        // Gera o caminho aleatório até a saída
-        createPath(entranceRow, entranceCol);
-
-        // Certifica que a saída está marcada como caminho
-        maze[exitRow][exitCol] = 0;
-    }
-
-    private void createPath(int currentRow, int currentCol) {
-        if (currentRow == exitRow && currentCol == exitCol) {
-            return; // Se chegamos à saída, paramos a recursão
+        for (int i = 0; i < ROWS; i++) {
+            if (maze[i][0] == PATH) { // Bordas da coluna esquerda
+                borderPaths[count][0] = i;
+                borderPaths[count][1] = 0;
+                count++;
+            }
+            if (maze[i][COLS - 1] == PATH) { // Bordas da coluna direita
+                borderPaths[count][0] = i;
+                borderPaths[count][1] = COLS - 1;
+                count++;
+            }
+        }
+        for (int j = 0; j < COLS; j++) {
+            if (maze[0][j] == PATH) { // Bordas da linha superior
+                borderPaths[count][0] = 0;
+                borderPaths[count][1] = j;
+                count++;
+            }
+            if (maze[ROWS - 1][j] == PATH) { // Bordas da linha inferior
+                borderPaths[count][0] = ROWS - 1;
+                borderPaths[count][1] = j;
+                count++;
+            }
         }
 
-        int[][] directions = {{-2, 0}, {2, 0}, {0, -2}, {0, 2}}; // Up, Down, Left, Right
-        Random random = new Random();
-
-        // Embaralha as direções
-        for (int i = 0; i < directions.length; i++) {
-            int randIndex = random.nextInt(directions.length);
-            int[] temp = directions[i];
-            directions[i] = directions[randIndex];
-            directions[randIndex] = temp;
-        }
-
-        for (int[] direction : directions) {
-            int newRow = currentRow + direction[0];
-            int newCol = currentCol + direction[1];
-
-            // Verifica se a nova célula é válida
-            if (isValid(newRow, newCol)) {
-                // Remove a parede entre a célula atual e a nova célula
-                maze[currentRow + direction[0] / 2][currentCol + direction[1] / 2] = 0;
-
-                // Marca a nova célula como visitada
-                maze[newRow][newCol] = 0;
-                visited[newRow][newCol] = true;
-
-                // Chama recursivamente para a nova célula
-                createPath(newRow, newCol);
+        // Remove caminhos extras nas bordas, mantendo apenas dois
+        while (count > 2) {
+            int index = random.nextInt(count); // Escolhe um caminho de borda aleatório para remover
+            int row = borderPaths[index][0];
+            int col = borderPaths[index][1];
+            if (!(row == 0 && col == 0)) { // Garante que não remova a entrada
+                maze[row][col] = WALL;
+                borderPaths[index] = borderPaths[--count]; // Remove o caminho da lista
             }
         }
     }
 
-    private boolean isValid(int row, int col) {
-        return row > 0 && row < rows && col > 0 && col < cols && !visited[row][col];
-    }
-
-
-    public void printMaze() {
-        for (int[] row : maze) {
-            for (int cell : row) {
-                System.out.print(cell + " ");
-            }
-            System.out.println();
-        }
-    }
-
-    public void saveMazeToCSV(String filePath) {
-        try (FileWriter writer = new FileWriter(filePath)) {
-            for (int[] row : maze) {
-                for (int j = 0; j < row.length; j++) {
-                    writer.write(row[j] + (j == row.length - 1 ? "" : ","));
+    // Salva o labirinto em um arquivo CSV
+    private void saveMazeToCSV(String filename) {
+        try (FileWriter writer = new FileWriter(filename)) {
+            for (int i = 0; i < ROWS; i++) {
+                for (int j = 0; j < COLS; j++) {
+                    writer.append(String.valueOf(maze[i][j]));
+                    if (j < COLS - 1) writer.append(",");
                 }
-                writer.write("\n");
+                writer.append("\n");
             }
+            System.out.println("Labirinto salvo com sucesso em " + filename);
         } catch (IOException e) {
-            System.out.println("An error occurred while saving the maze: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
 }
