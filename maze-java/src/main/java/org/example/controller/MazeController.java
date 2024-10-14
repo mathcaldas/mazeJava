@@ -1,35 +1,47 @@
 package org.example.controller;
 
-import org.example.model.MazeModel;
+import org.example.model.Backtracker;
+import org.example.model.Coordinate;
+import org.example.model.Maze;
 import org.example.view.MazeView;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+
 
 public class MazeController {
-    private MazeModel model;
-    private MazeView view;
-/*
-    public MazeController(MazeModel model, MazeView view) {
-        this.model = model;
-        this.view = view;
-        iniciarAnimacao();
+    Maze maze;
+    MazeView view;
+    Backtracker backtracker;
+
+    public MazeController() {
+        //this.maze = new Maze();
+        //this.view = new MazeView(maze);
+        //this.backtracker = new Backtracker();
     }
 
-    private void iniciarAnimacao() {
-        Timer timer = new Timer(250, e -> moverJogador());
+    public void initMaze (String filePath) {
+        maze.csvToMaze(filePath);
+        backtracker.runDepth(maze);
+    }
+
+    public void initGraphics() {
+        ArrayList<ArrayList<Integer>> mazeArray = maze.getMaze();
+        view.gameWindow(mazeArray);
+    }
+
+    public void initAnimation() {
+        Timer timer = new Timer(250, e -> movePlayer());
         timer.start();
     }
 
-    private void moverJogador() {
-        // Remove o jogador da posição atual
-        view.limparPosicaoJogador(model.getPlayerRow(), model.getPlayerCol());
-
-        // Atualiza a posição do jogador no model
-        model.moverJogador();
-
-        // Atualiza a posição do jogador na view
-        view.atualizarPosicaoJogador(model.getPlayerRow(), model.getPlayerCol());
+    public void movePlayer() {
+        JPanel[][] cells = view.getCells();
+        for (Coordinate coord : backtracker.getPath()) {
+            int i = coord.getX();
+            int j = coord.getY();
+            cells[i][j].setBackground(Color.RED);
+        }
     }
-
- */
 }

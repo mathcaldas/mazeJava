@@ -1,4 +1,7 @@
 package org.example.view;
+import org.example.model.Backtracker;
+import org.example.model.Coordinate;
+import org.example.model.Maze;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,29 +9,20 @@ import java.util.ArrayList;
 
 public class MazeView extends JFrame {
     private JPanel[][] cells;
+    private int rows, cols;
+    private int playerRow, playerCol;
+    Backtracker backtracker;
 
-    public MazeView(int[][] labirinto) {
-        cells = new JPanel[labirinto.length][labirinto[0].length];
-        initUI(labirinto);
+    public MazeView(Maze maze) {
+        this.rows = maze.getWidth();
+        this.cols = maze.getHeight();
+        this.cells = new JPanel[rows][cols];
     }
 
-    private void initUI(int[][] labirinto) {
-        setTitle("Labirinto com Animação");
+    public void gameWindow(ArrayList<ArrayList<Integer>> maze) {
+        setTitle("Labirinto IH HII");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(labirinto.length, labirinto[0].length));
-
-        for (int i = 0; i < labirinto.length; i++) {
-            for (int j = 0; j < labirinto[i].length; j++) {
-                cells[i][j] = new JPanel();
-                cells[i][j].setBackground(labirinto[i][j] == 0 ? Color.BLACK : Color.WHITE);
-                add(cells[i][j]);
-            }
-        }
-
-        setSize(400, 400);
-        setLocationRelativeTo(null);
-        setVisible(true);
-    }
+        setLayout(new GridLayout(10, 10));
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
