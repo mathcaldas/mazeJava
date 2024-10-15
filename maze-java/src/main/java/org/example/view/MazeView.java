@@ -24,7 +24,7 @@ public class MazeView extends JFrame {
     public void gameWindow() {
         setTitle("Labirinto IH HII");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(10, 10));
+        setLayout(new GridLayout(20, 20));
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {

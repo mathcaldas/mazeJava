@@ -8,13 +8,15 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        String filePath = "maze-java/mazes/file.csv";
+        String filePath = "maze-java/mazes/20x20.csv";
 
         MazeController controller = new MazeController(filePath);
         List<Coordinate> path = controller.runDepth();
         SwingUtilities.invokeLater(() -> {
             controller.initGraphics();
-            controller.initAnimation(path);
+            // controller.initAnimation(path);
+            // controller.initAnimationWithImage(path);
+            controller.initAnimationWithImageAndSound(path);
         });
     }
 }
