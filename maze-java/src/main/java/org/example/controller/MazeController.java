@@ -20,7 +20,7 @@ public class MazeController {
     MazeView view;
     Backtracker backtracker;
 
-    public MazeController(String csvFileName) {
+    public MazeController(String csvFileName, int size) {
         this.maze = new Maze(csvFileName);
         this.view = new MazeView(maze);
         this.backtracker = new Backtracker();
@@ -30,8 +30,8 @@ public class MazeController {
         return backtracker.runDepth(maze);
     }
 
-    public void initGraphics() {
-        view.gameWindow();
+    public void initGraphics(int size) {
+        view.gameWindow(size);
     }
 
     public void initAnimation( List<Coordinate> path) {
