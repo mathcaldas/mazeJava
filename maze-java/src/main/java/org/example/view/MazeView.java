@@ -49,20 +49,6 @@ public class MazeView extends JFrame {
         cells[playerRow][playerCol].setBackground(Color.RED);
     }
 
-    public void initAnimation() {
-        Timer timer = new Timer(250, e -> movePlayer());
-        timer.start();
-    }
-
-    public void movePlayer() {
-        JPanel[][] cells = getCells();
-
-        for (Coordinate coord : backtracker.getPath()) {
-            int i = coord.getX();
-            int j = coord.getY();
-            cells[i][j].setBackground(Color.RED);
-        }
-    }
 
     public JPanel[][] getCells() {
         return cells;
