@@ -7,11 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Maze {
-    ArrayList<ArrayList<Integer>> maze = new ArrayList<>();
-    int width, height;
+    private ArrayList<ArrayList<Integer>> maze;
+    private int width, height;
     private ArrayList<ArrayList<Boolean>> visited;
     // estamos utilizando um começo fixo no [0,0]
-    private Coordinate startPoint = new Coordinate(0, 0);
+    private Coordinate startPoint;
+
+    public Maze(String csvFileName) {
+        this.maze = new ArrayList<>();
+        this.startPoint = new Coordinate(0, 0);
+
+        csvToMaze(csvFileName);
+    }
 
 
     public void csvToMaze(String csvFileName) {

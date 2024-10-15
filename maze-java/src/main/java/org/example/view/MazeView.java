@@ -8,18 +8,20 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class MazeView extends JFrame {
+    ArrayList<ArrayList<Integer>> maze;
     private JPanel[][] cells;
     private int rows, cols;
     private int playerRow, playerCol;
     Backtracker backtracker;
 
     public MazeView(Maze maze) {
+        this.maze = maze.getMaze();
         this.rows = maze.getWidth();
         this.cols = maze.getHeight();
         this.cells = new JPanel[rows][cols];
     }
 
-    public void gameWindow(ArrayList<ArrayList<Integer>> maze) {
+    public void gameWindow() {
         setTitle("Labirinto IH HII");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridLayout(10, 10));
@@ -35,19 +37,19 @@ public class MazeView extends JFrame {
                 add(cells[i][j]);
             }
         }
+        initPlayer();
         setSize(400, 400); // Ajusta o tamanho da janela
         setLocationRelativeTo(null); // Centraliza a janela
         setVisible(true); // Torna a janela visível
     }
 
-    public JPanel[][] getCells() {
-        return cells;
-    }
-
-    public void initAnimation() {
+    public void initPlayer() {
         playerRow = 0;
         playerCol = 0;
         cells[playerRow][playerCol].setBackground(Color.RED);
+    }
+
+    public void initAnimation() {
         Timer timer = new Timer(250, e -> movePlayer());
         timer.start();
     }
@@ -60,5 +62,9 @@ public class MazeView extends JFrame {
             int j = coord.getY();
             cells[i][j].setBackground(Color.RED);
         }
+    }
+
+    public JPanel[][] getCells() {
+        return cells;
     }
 }
